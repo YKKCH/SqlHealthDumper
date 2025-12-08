@@ -41,7 +41,7 @@ SqlHealthDumper は SQL Server の健全性を一括取得し、LLM（ChatGPT / 
 
 生成物例:
 ```
-output/
+result/
   localhost,46551_20251208_1329/
     00_instance_overview.md
     snapshot_state.json
@@ -90,7 +90,7 @@ output/
 **前提:** .NET 8 SDK が必要です。
 
 ```bash
-git clone https://github.com/<your-org>/SqlHealthDumper.git
+git clone https://github.com/YKKCH/SqlHealthDumper.git
 cd SqlHealthDumper
 dotnet publish src/SqlHealthDumper -c Release
 
@@ -125,7 +125,7 @@ dotnet run --project src/SqlHealthDumper -- run --server prodsql --auth sql --us
 | `--no-table-md` | テーブル Markdown / ヒストを出力しない。 | `false` |
 | `--no-backup-info` | バックアップ/メンテナンス収集を無効化。 | `false` |
 | `--no-stats` | 統計収集を無効化。 | `false` |
-| `--mode` | 実行モード `low` / `balanced` / `fast`。 | `low` |
+| `--mode` | 実行プロファイル（負荷レベル）を指定するモード `low` / `balanced` / `fast`。 | `low` |
 
 > 補足: `IncludeSystemObjects` と `--no-resume` は内部の設定項目として存在しますが、現在 CLI オプションには未露出です（ロードマップ参照）。
 
