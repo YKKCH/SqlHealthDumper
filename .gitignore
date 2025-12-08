@@ -1,0 +1,47 @@
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esult*/
+[Ll]og/
+
+# IDE folders and metadata
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.cache
+*.sln.docstates
+
+# NuGet packages
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Coverage and diagnostics
+coverage*/
+*.coverage
+*.coveragexml
+
+# OS-specific noise
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# .NET SDK local cache
+.dotnet/
+
+# Tooling
+*.tmp
+*.log
+*.tss
+
+# Local data/output
+result/
+*.local.json
+appsettings.Development.json
+docs/
