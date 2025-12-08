@@ -62,10 +62,33 @@ output/
 
 ## セットアップ
 ### 前提
-- .NET 8 SDK
 - 収集対象 SQL Server で `VIEW SERVER STATE`, `VIEW ANY DEFINITION`, `VIEW DATABASE STATE` などの権限（バックアップ履歴取得時は `msdb` 参照権限）。
 
-### ビルドと実行
+### 1. バイナリから使う（おすすめ）
+
+1. GitHub Releases から最新のバイナリをダウンロード
+   - Windows: `SqlHealthDumper-win-x64.zip`
+
+2. 任意のフォルダに解凍
+
+3. コマンドプロンプト or PowerShell（Windows）またはターミナル（Linux/macOS）で実行:
+
+   **Windows 認証の例:**
+   ```powershell
+   # Windows
+   .\SqlHealthDumper.exe run --server localhost --output .\result
+   ```
+
+   **SQL 認証の例:**
+   ```powershell
+   # Windows
+   .\SqlHealthDumper.exe run --server prodsql --auth sql --user sa --password "***" --output C:\snapshots
+   ```
+
+### 2. ソースからビルドする
+
+**前提:** .NET 8 SDK が必要です。
+
 ```bash
 git clone https://github.com/<your-org>/SqlHealthDumper.git
 cd SqlHealthDumper
@@ -77,6 +100,7 @@ dotnet run --project src/SqlHealthDumper -- run --server localhost --output .\re
 # SQL 認証の例
 dotnet run --project src/SqlHealthDumper -- run --server prodsql --auth sql --user sa --password "***" --output C:\snapshots
 ```
+
 エラー時には CLI がバリデーションの詳細とサンプルコマンドを表示します。`--output` 配下にはタイムスタンプ付きのサブフォルダが作られ、その直下に Markdown / JSON / log が配置されます。
 
 ## コマンドラインオプション
