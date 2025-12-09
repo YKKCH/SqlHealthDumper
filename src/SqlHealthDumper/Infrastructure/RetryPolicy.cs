@@ -27,6 +27,10 @@ public sealed class RetryPolicy
             {
                 return await work();
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch when (attempt < MaxRetryCount)
             {
                 attempt++;

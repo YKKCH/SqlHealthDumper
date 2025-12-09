@@ -65,7 +65,7 @@ internal sealed class DefaultSqlCommandExecutor : ISqlCommandExecutor
 {
     public async Task<DbDataReader> ExecuteReaderAsync(SqlConnection connection, string sql, int timeoutSeconds, CancellationToken cancellationToken = default)
     {
-        var cmd = new SqlCommand(sql, connection)
+        using var cmd = new SqlCommand(sql, connection)
         {
             CommandType = CommandType.Text,
             CommandTimeout = timeoutSeconds
