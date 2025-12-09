@@ -1,3 +1,4 @@
+using System.Linq;
 using SqlHealthDumper.Domain;
 using SqlHealthDumper.Infrastructure;
 using SqlHealthDumper.Options;
@@ -229,7 +230,7 @@ public sealed class TableCollector
                 if (config.Execution.TableMaxParallelism <= 1)
                 {
                     var buckets = await _sql.QueryAsync(connection, histogramSql, timeoutSeconds, cancellationToken);
-                    var mapped = buckets.Select(MapHistogramBucket).ToList();
+                    var mapped = MapHistogramBuckets(buckets);
                     stat.HistogramSummary = BuildHistogramSummary(mapped);
                     stat.HistogramDetail.AddRange(mapped);
                     stat.HistogramUnavailable = false;
@@ -255,17 +256,28 @@ public sealed class TableCollector
 
     private static string? CachedHistogramRowCountColumn;
 
-    private static HistogramBucket MapHistogramBucket(Dictionary<string, object?> row)
+    private static List<HistogramBucket> MapHistogramBuckets(List<Dictionary<string, object?>> rows)
     {
-        var eqRowsColumn = CachedHistogramRowCountColumn ??= DetectHistogramCountColumn(row);
-        return new HistogramBucket
+        var eqRowsColumn = CachedHistogramRowCountColumn ??= DetectHistogramCountColumn(rows.FirstOrDefault() ?? new Dictionary<string, object?>());
+        var mapped = new List<HistogramBucket>(rows.Count);
+        double? previousHigh = null;
+
+        foreach (var row in rows)
         {
-            RangeFrom = ConvertToDouble(row.GetValueOrDefault("range_high_key")),
-            RangeTo = ConvertToDouble(row.GetValueOrDefault("range_high_key")),
-            EqualRows = ConvertToDouble(row.GetValueOrDefault(eqRowsColumn)),
-            RangeRows = ConvertToDouble(row.GetValueOrDefault("range_rows")),
-            DistinctRangeRows = ConvertToDouble(row.GetValueOrDefault("distinct_range_rows"))
-        };
+            var high = ConvertToDouble(row.GetValueOrDefault("range_high_key"));
+            var bucket = new HistogramBucket
+            {
+                RangeFrom = previousHigh ?? high,
+                RangeTo = high,
+                EqualRows = ConvertToDouble(row.GetValueOrDefault(eqRowsColumn)),
+                RangeRows = ConvertToDouble(row.GetValueOrDefault("range_rows")),
+                DistinctRangeRows = ConvertToDouble(row.GetValueOrDefault("distinct_range_rows"))
+            };
+            mapped.Add(bucket);
+            previousHigh = high;
+        }
+
+        return mapped;
     }
 
     private static string DetectHistogramCountColumn(Dictionary<string, object?> row)
@@ -364,7 +376,7 @@ public sealed class TableCollector
         {
             using var conn = _connectionFactory.CreateOpenConnection(config, databaseName);
             var rows = await _sql.QueryAsync(conn, histogramSql, timeoutSeconds, cancellationToken);
-            var mapped = rows.Select(MapHistogramBucket).ToList();
+            var mapped = MapHistogramBuckets(rows);
             stat.HistogramSummary = BuildHistogramSummary(mapped);
             stat.HistogramDetail.AddRange(mapped);
         }
