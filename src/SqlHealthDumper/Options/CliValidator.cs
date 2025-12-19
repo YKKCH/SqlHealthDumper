@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace SqlHealthDumper.Options;
 
 /// <summary>
@@ -82,6 +84,35 @@ public static class CliValidator
         };
 
         return string.Join(Environment.NewLine, samples);
+    }
+
+    /// <summary>
+    /// serve コマンド用オプションの妥当性をチェックする。
+    /// </summary>
+    public static List<string> ValidateServe(ServeOptions options)
+    {
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(options.RootPath))
+        {
+            errors.Add("--path にはディレクトリを指定してください。");
+        }
+        else if (!Directory.Exists(options.RootPath))
+        {
+            errors.Add($"--path で指定したディレクトリが存在しません: {options.RootPath}");
+        }
+
+        if (options.Port <= 0 || options.Port > 65535)
+        {
+            errors.Add("--port は 1 から 65535 の範囲で指定してください。");
+        }
+
+        if (string.IsNullOrWhiteSpace(options.Host))
+        {
+            errors.Add("--host には待ち受けホスト名を指定してください。");
+        }
+
+        return errors;
     }
 
     private static bool IsSqlAuth(CliOptions cli)

@@ -402,7 +402,32 @@ public sealed class TableCollector
 
     private static double ConvertToDouble(object? value)
     {
-        if (value is null) return 0d;
-        return Convert.ToDouble(value);
+        if (value is null || value == DBNull.Value) return 0d;
+        
+        if (value is double d) return d;
+        if (value is float f) return f;
+        if (value is decimal dec) return (double)dec;
+        if (value is int i) return i;
+        if (value is long l) return l;
+        if (value is short s) return s;
+        if (value is byte b) return b;
+        if (value is uint ui) return ui;
+        if (value is ulong ul) return ul;
+        if (value is ushort us) return us;
+        if (value is sbyte sb) return sb;
+        
+        if (value is string str && double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+        {
+            return parsed;
+        }
+        
+        try
+        {
+            return Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture);
+        }
+        catch
+        {
+            return 0d;
+        }
     }
 }

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SqlHealthDumper Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>SqlHealthDumper Dashboard</h1>
+        <p class="subtitle">収集済みスナップショットをブラウザで参照できます</p>
+      </div>
+      <div class="actions">
+        <button id="refreshSnapshots" type="button">一覧を更新</button>
+      </div>
+    </header>
+    <div id="message" role="status" aria-live="polite"></div>
+    <main class="layout">
+      <section class="panel snapshots">
+        <div class="panel-header">
+          <h2>Snapshots</h2>
+          <span class="hint">クリックで選択</span>
+        </div>
+        <ul id="snapshotList" class="list"></ul>
+      </section>
+      <section class="panel files">
+        <div class="panel-header">
+          <h2>Files</h2>
+          <span class="hint" id="fileCountHint"></span>
+        </div>
+        <ul id="fileList" class="list"></ul>
+      </section>
+      <section class="panel viewer">
+        <div class="panel-header">
+          <h2 id="viewerTitle">Viewer</h2>
+          <span class="hint" id="viewerMeta"></span>
+        </div>
+        <div id="viewerContent" class="viewer-content">
+          <p class="muted">スナップショットとファイルを選択するとコンテンツが表示されます。</p>
+        </div>
+      </section>
+    </main>
+    <footer class="app-footer">
+      <span>SqlHealthDumper serve</span>
+      <span>ローカルでのみ利用してください</span>
+    </footer>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

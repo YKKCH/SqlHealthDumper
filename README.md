@@ -129,6 +129,24 @@ dotnet run --project src/SqlHealthDumper -- run --server prodsql --auth sql --us
 
 > 補足: `IncludeSystemObjects` と `--no-resume` は内部の設定項目として存在しますが、現在 CLI オプションには未露出です（ロードマップ参照）。
 
+### Web ダッシュボード (`serve` コマンド)
+
+収集済みスナップショットをブラウザで閲覧したい場合は `serve` サブコマンドを使用します。指定ディレクトリ配下のスナップショットを自動検出し、ファイル一覧と Markdown/JSON のプレビューを提供します。
+
+```bash
+# 例: result 配下を 5080 番ポートで公開しブラウザを自動起動
+SqlHealthDumper serve --path ./result --port 5080 --open-browser
+```
+
+| オプション | 説明 | 既定値 |
+| --- | --- | --- |
+| `--path` | スナップショットを格納したディレクトリ、もしくは個別スナップショットフォルダ。 | `./result` |
+| `--port` | 待ち受けポート番号。 | `5080` |
+| `--host` | バインドするホスト。`0.0.0.0` を指定すると LAN からもアクセスできます（自己責任）。 | `localhost` |
+| `--open-browser` | 起動後に既定ブラウザを開く。 | `false` |
+
+> serve コマンドはローカル環境向けに設計されています。プレビュー対象はテキストファイルのみで、2 MB を超える場合は冒頭部分だけを表示します。
+
 ## 運用メモ
 - **ログ & リジューム**  
   コンソールと `<output>/log.txt` に同時出力。実行中は `snapshot_state.json` と `failures.json` を逐次更新し、再実行時は完了済みセクションを自動スキップします。
@@ -157,7 +175,7 @@ dotnet run --project src/SqlHealthDumper -- run --server prodsql --auth sql --us
 
 ## ロードマップ
 - 継続監視・スケジュール実行機能
-- HTML レポート / Web ダッシュボード
+- HTML レポート / Web ダッシュボード拡張（serve UI の比較・共有機能）
 - Grafana・Elasticsearch・OpenTelemetry 連携
 - クエリプラグイン化（パック配布）
 - マルチインスタンス同時監視
@@ -167,10 +185,10 @@ dotnet run --project src/SqlHealthDumper -- run --server prodsql --auth sql --us
 
 ## 既知の制限
 - Azure SQL Database では Missing Index / Backup 履歴の一部が取得できずスキップ扱いになります。
-- LLM 向けの Markdown / JSON 出力は提供済みですが、HTML / Web ダッシュボードは未実装（ロードマップ参照）。
+- LLM 向けの Markdown / JSON 出力は提供済みですが、静的 HTML 生成は未実装であり serve コマンドはローカルプレビュー向けの最小構成です。
 - `IncludeSystemObjects` や `NoResume` は AppConfig に存在するものの、現状 CLI で切り替えできません。
+- serve モードのプレビューはテキストのみ対象で 2 MB を超えるファイルは冒頭部分のみ表示されます。
 
 ## ライセンスと利用上のお願い
 - 本ツールは MIT License の下で公開されており、ソフトウェアは無保証（AS IS）で提供されます。
 - プロダクション環境に適用する際は、対象バージョンやワークロードで十分に検証したうえで導入してください。
-
