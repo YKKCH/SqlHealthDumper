@@ -65,12 +65,22 @@ internal sealed class DefaultSqlCommandExecutor : ISqlCommandExecutor
 {
     public async Task<DbDataReader> ExecuteReaderAsync(SqlConnection connection, string sql, int timeoutSeconds, CancellationToken cancellationToken = default)
     {
-        using var cmd = new SqlCommand(sql, connection)
+        // SqlDataReader は実行した SqlCommand に依存するため、呼び出し元がリーダーを読み終える
+        // 前にコマンドを破棄してはいけない。using にせずリーダーに所有権を委ねる。
+        var cmd = new SqlCommand(sql, connection)
         {
             CommandType = CommandType.Text,
             CommandTimeout = timeoutSeconds
         };
 
-        return await cmd.ExecuteReaderAsync(cancellationToken);
+        try
+        {
+            return await cmd.ExecuteReaderAsync(cancellationToken);
+        }
+        catch
+        {
+            cmd.Dispose();
+            throw;
+        }
     }
 }
